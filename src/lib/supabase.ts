@@ -4,8 +4,8 @@
 import { createClient } from '@supabase/supabase-js';
 
 // Placeholder URLs - replace with actual Supabase project credentials
-const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || 'COLOQUE_AQUI';
-const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || 'COLOQUE_AQUI';
+const supabaseUrl = import.meta.env.VITE_SUPABASE_URL || 'COLOQUE_AQUI';
+const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY || 'COLOQUE_AQUI';
 
 // Create Supabase client
 export const supabase = createClient(supabaseUrl, supabaseAnonKey);
