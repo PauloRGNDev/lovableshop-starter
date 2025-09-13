@@ -47,28 +47,51 @@ export const useAuth = () => {
 
   const loadUserProfile = async (user: User) => {
     try {
-        // Since no tables exist yet, we'll create a placeholder profile
-        // This will be replaced once the profiles table is created via migration
-        const userProfile: UserProfile = {
-          id: user.id,
-          full_name: user.user_metadata?.full_name || '',
-          email: user.email || '',
-          is_admin: false,
-          created_at: new Date().toISOString(),
-          updated_at: new Date().toISOString(),
-        };
+      // First check if profile exists
+      let { data: profile, error: profileError } = await supabase
+        .from('profiles')
+        .select('*')
+        .eq('user_id', user.id)
+        .single();
 
-        setAuthState({
-          user: userProfile,
-          isLoading: false,
-          isAdmin: userProfile.is_admin,
-        });
+      // If profile doesn't exist, create it
+      if (profileError && profileError.code === 'PGRST116') {
+        const { data: newProfile, error: createError } = await supabase
+          .from('profiles')
+          .insert({
+            user_id: user.id,
+            full_name: user.user_metadata?.full_name || user.email?.split('@')[0] || '',
+          })
+          .select()
+          .single();
+
+        if (createError) throw createError;
+        profile = newProfile;
+      } else if (profileError) {
+        throw profileError;
+      }
+
+      const userProfile: UserProfile = {
+        id: profile.id,
+        full_name: profile.full_name,
+        email: user.email || '',
+        is_admin: false, // For now, all users are regular users
+        created_at: profile.created_at,
+        updated_at: profile.updated_at,
+      };
+
+      setAuthState({
+        user: userProfile,
+        isLoading: false,
+        isAdmin: userProfile.is_admin,
+      });
     } catch (error) {
       console.error('Error in loadUserProfile:', error);
+      // Fallback to basic user data
       setAuthState({
         user: {
           id: user.id,
-          full_name: user.user_metadata?.full_name || '',
+          full_name: user.user_metadata?.full_name || user.email?.split('@')[0] || '',
           email: user.email || '',
           is_admin: false,
           created_at: new Date().toISOString(),

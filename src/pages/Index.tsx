@@ -12,6 +12,7 @@ import { Button } from '@/components/ui/button';
 import { useAuth } from '@/hooks/useAuth';
 import { useToast } from '@/hooks/use-toast';
 import { mockProducts } from '@/data/mockProducts';
+import { useProducts } from '@/hooks/useProducts';
 import { Product } from '@/types';
 import { LogOut, User, Settings } from 'lucide-react';
 
@@ -22,7 +23,21 @@ const Index = () => {
   const [isUserMenuOpen, setIsUserMenuOpen] = useState(false);
   
   const { user, isLoading, isAdmin, signOut } = useAuth();
+  const { products: databaseProducts, isLoading: productsLoading } = useProducts();
   const { toast } = useToast();
+
+  // Use database products if available, fallback to mock products
+  const products = databaseProducts.length > 0 ? databaseProducts.map(p => ({
+    id: p.id,
+    name: p.name,
+    description: p.description || '',
+    price: p.price_cents,
+    image_url: p.image_url || '/api/placeholder/400/400',
+    category: p.category,
+    in_stock: p.in_stock,
+    created_at: p.created_at,
+    updated_at: p.updated_at,
+  })) : mockProducts;
 
   const handleAuthSuccess = () => {
     setIsAuthModalOpen(false);
@@ -127,7 +142,7 @@ const Index = () => {
       <section id="products" className="py-16 px-4">
         <div className="container mx-auto max-w-7xl">
           <ProductGrid
-            products={mockProducts}
+            products={products}
             onProductView={handleProductView}
             onProductWishlist={handleProductWishlist}
           />
