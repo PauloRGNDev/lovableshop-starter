@@ -1,73 +1,141 @@
-# Welcome to your Lovable project
+# Deleza Joias - E-commerce
 
-## Project info
+Projeto completo de e-commerce para joias artesanais desenvolvido com Next.js, TypeScript, Supabase e Stripe.
 
-**URL**: https://lovable.dev/projects/28f3e643-d873-4176-a556-f6f5beac5218
+## 🚀 Como rodar localmente
 
-## How can I edit this code?
+### Pré-requisitos
+- Node.js (versão 16 ou superior)
+- Conta no Supabase
+- Conta no Stripe
 
-There are several ways of editing your application.
+### Passos de instalação
 
-**Use Lovable**
-
-Simply visit the [Lovable Project](https://lovable.dev/projects/28f3e643-d873-4176-a556-f6f5beac5218) and start prompting.
-
-Changes made via Lovable will be committed automatically to this repo.
-
-**Use your preferred IDE**
-
-If you want to work locally using your own IDE, you can clone this repo and push changes. Pushed changes will also be reflected in Lovable.
-
-The only requirement is having Node.js & npm installed - [install with nvm](https://github.com/nvm-sh/nvm#installing-and-updating)
-
-Follow these steps:
-
-```sh
-# Step 1: Clone the repository using the project's Git URL.
+1. **Clone o repositório**
+```bash
 git clone <YOUR_GIT_URL>
+cd deleza-joias
+```
 
-# Step 2: Navigate to the project directory.
-cd <YOUR_PROJECT_NAME>
+2. **Instale as dependências**
+```bash
+npm install
+```
 
-# Step 3: Install the necessary dependencies.
-npm i
+3. **Configure as variáveis de ambiente**
+```bash
+cp .env.example .env.local
+```
 
-# Step 4: Start the development server with auto-reloading and an instant preview.
+Edite o arquivo `.env.local` e configure as seguintes variáveis:
+
+```env
+# Supabase Configuration
+NEXT_PUBLIC_SUPABASE_URL=sua_url_supabase_aqui
+NEXT_PUBLIC_SUPABASE_ANON_KEY=sua_chave_anonima_supabase_aqui
+SUPABASE_SERVICE_ROLE_KEY=sua_service_role_key_aqui
+
+# Stripe Configuration
+NEXT_PUBLIC_STRIPE_PUBLIC_KEY=pk_test_sua_chave_publica_stripe_aqui
+STRIPE_SECRET_KEY=sk_test_sua_chave_secreta_stripe_aqui
+
+# Base URL
+NEXT_PUBLIC_BASE_URL=http://localhost:3000
+```
+
+4. **Configure o banco de dados**
+- Execute o script SQL em `db/init.sql` no seu painel Supabase
+- Isso criará todas as tabelas necessárias e dados de exemplo
+
+5. **Execute o projeto**
+```bash
 npm run dev
 ```
 
-**Edit a file directly in GitHub**
+6. **Verificar build**
+```bash
+npm run build
+```
 
-- Navigate to the desired file(s).
-- Click the "Edit" button (pencil icon) at the top right of the file view.
-- Make your changes and commit the changes.
+## 🛠 Tecnologias
 
-**Use GitHub Codespaces**
+- **Frontend**: Next.js 14, TypeScript, Tailwind CSS
+- **Backend**: Supabase (PostgreSQL)
+- **Pagamentos**: Stripe
+- **Autenticação**: Supabase Auth
+- **UI**: shadcn/ui, Radix UI
 
-- Navigate to the main page of your repository.
-- Click on the "Code" button (green button) near the top right.
-- Select the "Codespaces" tab.
-- Click on "New codespace" to launch a new Codespace environment.
-- Edit files directly within the Codespace and commit and push your changes once you're done.
+## 📱 Funcionalidades
 
-## What technologies are used for this project?
+### Implementadas
+- ✅ Design system completo com tema luxury gold
+- ✅ Catálogo de produtos com filtros e busca
+- ✅ Carrinho de compras funcional (Context API)
+- ✅ Sistema de autenticação (cadastro/login)
+- ✅ Scaffold do painel administrativo
+- ✅ Integração Stripe preparada
+- ✅ Páginas de teste e verificação
 
-This project is built with:
+### Em desenvolvimento
+- 🔄 CRUD completo de produtos (admin)
+- 🔄 Checkout completo com Stripe
+- 🔄 Gestão de pedidos
+- 🔄 Upload de imagens
+- 🔄 Sistema de wishlist
 
-- Vite
-- TypeScript
-- React
-- shadcn-ui
-- Tailwind CSS
+## 🔍 Páginas especiais
 
-## How can I deploy this project?
+- `/dev-check` - Verificação do status de configuração
+- `/test-cart` - Teste das funcionalidades do carrinho
+- `/admin` - Painel administrativo (requer permissão)
 
-Simply open [Lovable](https://lovable.dev/projects/28f3e643-d873-4176-a556-f6f5beac5218) and click on Share -> Publish.
+## 🎨 Design System
 
-## Can I connect a custom domain to my Lovable project?
+O projeto utiliza um design system completo baseado no tema luxury com:
+- Paleta dourada elegante
+- Tipografia Playfair Display + Inter
+- Componentes shadcn/ui customizados
+- Animações suaves e transições
 
-Yes, you can!
+## 🔐 Segurança
 
-To connect a domain, navigate to Project > Settings > Domains and click Connect Domain.
+- Row Level Security (RLS) configurado no Supabase
+- Autenticação JWT via Supabase Auth
+- Validação de permissões admin
+- Sanitização de dados
 
-Read more here: [Setting up a custom domain](https://docs.lovable.dev/tips-tricks/custom-domain#step-by-step-guide)
+## 📦 Estrutura do projeto
+
+```
+src/
+├── components/         # Componentes reutilizáveis
+├── contexts/          # React Contexts (CartContext)
+├── hooks/            # Custom hooks (useAuth)
+├── lib/              # Utilitários e configurações
+├── pages/            # Páginas Next.js
+├── types/            # TypeScript type definitions
+└── data/             # Dados mock e constantes
+
+db/
+└── init.sql          # Script de inicialização do banco
+
+.env.example          # Template das variáveis de ambiente
+```
+
+## 🚀 Deploy
+
+1. Configure as variáveis de ambiente no seu provedor
+2. Execute `npm run build` para verificar builds
+3. Deploy para Vercel, Netlify ou similar
+4. Configure domínio customizado (opcional)
+
+## 📞 Suporte
+
+Para dúvidas ou problemas:
+- Verifique a página `/dev-check` para status das configurações
+- Consulte logs do console para erros
+- Teste funcionalidades em `/test-cart`
+
+---
+
+**Deleza Joias** - Elegância que Encanta ✨
