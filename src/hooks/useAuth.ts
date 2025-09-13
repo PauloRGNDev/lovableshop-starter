@@ -1,7 +1,7 @@
 // Deleza Joias - Authentication Hook
 import { useState, useEffect } from 'react';
 import { User } from '@supabase/supabase-js';
-import { supabase, TABLES } from '@/lib/supabase';
+import { supabase } from '@/integrations/supabase/client';
 import { UserProfile, AuthState } from '@/types';
 
 export const useAuth = () => {
@@ -47,30 +47,22 @@ export const useAuth = () => {
 
   const loadUserProfile = async (user: User) => {
     try {
-      const { data: profile, error } = await supabase
-        .from(TABLES.PROFILES)
-        .select('*')
-        .eq('id', user.id)
-        .single();
+        // Since no tables exist yet, we'll create a placeholder profile
+        // This will be replaced once the profiles table is created via migration
+        const userProfile: UserProfile = {
+          id: user.id,
+          full_name: user.user_metadata?.full_name || '',
+          email: user.email || '',
+          is_admin: false,
+          created_at: new Date().toISOString(),
+          updated_at: new Date().toISOString(),
+        };
 
-      if (error && error.code !== 'PGRST116') { // PGRST116 = no rows returned
-        console.error('Error loading user profile:', error);
-      }
-
-      const userProfile: UserProfile = profile || {
-        id: user.id,
-        full_name: user.user_metadata?.full_name || '',
-        email: user.email || '',
-        is_admin: false,
-        created_at: new Date().toISOString(),
-        updated_at: new Date().toISOString(),
-      };
-
-      setAuthState({
-        user: userProfile,
-        isLoading: false,
-        isAdmin: userProfile.is_admin,
-      });
+        setAuthState({
+          user: userProfile,
+          isLoading: false,
+          isAdmin: userProfile.is_admin,
+        });
     } catch (error) {
       console.error('Error in loadUserProfile:', error);
       setAuthState({

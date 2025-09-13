@@ -4,7 +4,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { supabase, TABLES } from '@/lib/supabase';
+import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
 import { Eye, EyeOff, Loader2 } from 'lucide-react';
 
@@ -84,21 +84,9 @@ export const SignUp: React.FC<SignUpProps> = ({ onSuccess, onSwitchToSignIn }) =
       }
 
       if (data.user) {
-        // Create user profile
-        const { error: profileError } = await supabase
-          .from(TABLES.PROFILES)
-          .upsert({
-            id: data.user.id,
-            full_name: formData.fullName.trim(),
-            email: formData.email.toLowerCase().trim(),
-            is_admin: false,
-          });
-
-        if (profileError) {
-          console.error('Profile creation error:', profileError);
-          // Continue even if profile creation fails
-        }
-
+        // Since no tables exist yet, skip profile creation
+        // This will be enabled once the profiles table is created via migration
+        
         toast({
           title: 'Conta Criada!',
           description: 'Verifique seu e-mail para confirmar a conta.',
