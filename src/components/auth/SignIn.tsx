@@ -3,10 +3,10 @@ import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { supabase } from '@/integrations/supabase/client';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { useToast } from '@/hooks/use-toast';
-import { Eye, EyeOff, Loader2 } from 'lucide-react';
+import { supabase } from '@/integrations/supabase/client';
+import { Loader2, Eye, EyeOff } from 'lucide-react';
 
 interface SignInProps {
   onSuccess?: () => void;
@@ -26,64 +26,78 @@ export const SignIn: React.FC<SignInProps> = ({ onSuccess, onSwitchToSignUp }) =
     setFormData(prev => ({ ...prev, [field]: value }));
   };
 
-  const validateForm = (): string | null => {
+  const validateForm = () => {
     if (!formData.email.trim()) {
-      return 'E-mail é obrigatório.';
+      toast({
+        title: 'Erro',
+        description: 'Por favor, insira seu email.',
+        variant: 'destructive',
+      });
+      return false;
     }
-    
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    if (!emailRegex.test(formData.email)) {
-      return 'E-mail inválido.';
+
+    if (!formData.email.includes('@')) {
+      toast({
+        title: 'Erro',
+        description: 'Por favor, insira um email válido.',
+        variant: 'destructive',
+      });
+      return false;
     }
-    
+
     if (!formData.password) {
-      return 'Senha é obrigatória.';
+      toast({
+        title: 'Erro',
+        description: 'Por favor, insira sua senha.',
+        variant: 'destructive',
+      });
+      return false;
     }
-    
-    return null;
+
+    return true;
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
-    const validationError = validateForm();
-    if (validationError) {
-      toast({
-        title: 'Erro de Validação',
-        description: validationError,
-        variant: 'destructive',
-      });
-      return;
-    }
+    if (!validateForm()) return;
 
     setIsLoading(true);
 
     try {
-      const { data, error } = await supabase.auth.signInWithPassword({
-        email: formData.email.toLowerCase().trim(),
+      const { error } = await supabase.auth.signInWithPassword({
+        email: formData.email.trim(),
         password: formData.password,
       });
 
       if (error) {
         if (error.message.includes('Invalid login credentials')) {
-          throw new Error('Conta não encontrada. Cadastre-se primeiro.');
+          toast({
+            title: 'Credenciais inválidas',
+            description: 'Email ou senha incorretos. Verifique seus dados e tente novamente.',
+            variant: 'destructive',
+          });
+        } else {
+          toast({
+            title: 'Erro no login',
+            description: error.message,
+            variant: 'destructive',
+          });
         }
-        throw error;
+        return;
       }
 
-      if (data.user) {
-        toast({
-          title: 'Login realizado!',
-          description: 'Bem-vindo de volta à Deleza Joias.',
-        });
-        
-        onSuccess?.();
-      }
-    } catch (error) {
-      console.error('Sign in error:', error);
       toast({
-        title: 'Erro no Login',
-        description: error instanceof Error ? error.message : 'Ocorreu um erro inesperado.',
+        title: 'Login realizado com sucesso!',
+        description: 'Bem-vindo de volta.',
+      });
+
+      onSuccess?.();
+    } catch (error) {
+      console.error('Error during sign in:', error);
+      toast({
+        title: 'Erro',
+        description: 'Ocorreu um erro inesperado. Tente novamente.',
         variant: 'destructive',
       });
     } finally {
@@ -94,60 +108,58 @@ export const SignIn: React.FC<SignInProps> = ({ onSuccess, onSwitchToSignUp }) =
   const handleForgotPassword = async () => {
     if (!formData.email.trim()) {
       toast({
-        title: 'E-mail Necessário',
-        description: 'Digite seu e-mail para recuperar a senha.',
+        title: 'Email necessário',
+        description: 'Por favor, insira seu email para recuperar a senha.',
         variant: 'destructive',
       });
       return;
     }
 
     try {
-      const { error } = await supabase.auth.resetPasswordForEmail(formData.email);
-      
+      const { error } = await supabase.auth.resetPasswordForEmail(formData.email.trim(), {
+        redirectTo: `${window.location.origin}/auth/reset-password`,
+      });
+
       if (error) throw error;
 
       toast({
-        title: 'E-mail Enviado',
-        description: 'Verifique sua caixa de entrada para redefinir a senha.',
+        title: 'Email enviado',
+        description: 'Verifique sua caixa de entrada para redefinir sua senha.',
       });
-    } catch (error) {
-      console.error('Password reset error:', error);
+    } catch (error: any) {
       toast({
         title: 'Erro',
-        description: 'Não foi possível enviar o e-mail de recuperação.',
+        description: error.message || 'Erro ao enviar email de recovery.',
         variant: 'destructive',
       });
     }
   };
 
   return (
-    <Card className="w-full max-w-md mx-auto shadow-luxury">
+    <Card className="w-full max-w-md mx-auto">
       <CardHeader className="text-center">
         <CardTitle className="text-2xl font-heading text-luxury-gold">
-          Entrar
+          Entrar na Conta
         </CardTitle>
-        <CardDescription>
+        <p className="text-muted-foreground">
           Acesse sua conta Deleza Joias
-        </CardDescription>
+        </p>
       </CardHeader>
       
       <CardContent>
         <form onSubmit={handleSubmit} className="space-y-4">
-          {/* Email */}
           <div className="space-y-2">
-            <Label htmlFor="email">E-mail</Label>
+            <Label htmlFor="email">Email</Label>
             <Input
               id="email"
               type="email"
               value={formData.email}
               onChange={(e) => handleInputChange('email', e.target.value)}
               placeholder="seu@email.com"
-              disabled={isLoading}
               required
             />
           </div>
 
-          {/* Password */}
           <div className="space-y-2">
             <Label htmlFor="password">Senha</Label>
             <div className="relative">
@@ -157,40 +169,40 @@ export const SignIn: React.FC<SignInProps> = ({ onSuccess, onSwitchToSignUp }) =
                 value={formData.password}
                 onChange={(e) => handleInputChange('password', e.target.value)}
                 placeholder="Sua senha"
-                disabled={isLoading}
                 required
               />
               <Button
                 type="button"
                 variant="ghost"
                 size="sm"
-                className="absolute right-2 top-1/2 -translate-y-1/2 h-auto p-1"
+                className="absolute right-0 top-0 h-full px-3 py-2 hover:bg-transparent"
                 onClick={() => setShowPassword(!showPassword)}
-                disabled={isLoading}
               >
-                {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                {showPassword ? (
+                  <EyeOff className="h-4 w-4" />
+                ) : (
+                  <Eye className="h-4 w-4" />
+                )}
               </Button>
             </div>
           </div>
 
-          {/* Forgot Password */}
-          <div className="text-right">
+          <div className="flex justify-end">
             <Button
               type="button"
               variant="link"
+              size="sm"
               onClick={handleForgotPassword}
-              className="p-0 h-auto text-sm text-muted-foreground hover:text-luxury-gold"
-              disabled={isLoading}
+              className="text-luxury-gold hover:text-luxury-gold/80 p-0"
             >
-              Esqueceu a senha?
+              Esqueci minha senha
             </Button>
           </div>
 
-          {/* Submit Button */}
-          <Button
-            type="submit"
-            className="w-full bg-luxury-gold text-luxury-black hover:bg-luxury-gold/90"
+          <Button 
+            type="submit" 
             disabled={isLoading}
+            className="w-full bg-luxury-gold text-luxury-black hover:bg-luxury-gold/90"
           >
             {isLoading ? (
               <>
@@ -202,19 +214,16 @@ export const SignIn: React.FC<SignInProps> = ({ onSuccess, onSwitchToSignUp }) =
             )}
           </Button>
 
-          {/* Switch to Sign Up */}
-          <div className="text-center pt-4">
-            <p className="text-sm text-muted-foreground">
-              Não tem uma conta?{' '}
-              <Button
-                type="button"
-                variant="link"
-                onClick={onSwitchToSignUp}
-                className="p-0 h-auto text-luxury-gold hover:text-luxury-gold/80"
-              >
-                Cadastre-se
-              </Button>
-            </p>
+          <div className="text-center text-sm">
+            <span className="text-muted-foreground">Não tem uma conta? </span>
+            <Button
+              type="button"
+              variant="link"
+              onClick={onSwitchToSignUp}
+              className="text-luxury-gold hover:text-luxury-gold/80 p-0"
+            >
+              Cadastre-se
+            </Button>
           </div>
         </form>
       </CardContent>

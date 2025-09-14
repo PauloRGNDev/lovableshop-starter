@@ -11,6 +11,8 @@ import ProductDetail from "./pages/ProductDetail";
 import Search from "./pages/Search";
 import About from "./pages/About";
 import Contact from "./pages/Contact";
+import Cart from "./pages/Cart";
+import Auth from "./pages/Auth";
 import AdminPanel from "./pages/AdminPanel";
 import TestCart from "./pages/TestCart";
 import DevCheck from "./pages/DevCheck";
@@ -33,6 +35,8 @@ const App = () => (
               <Route path="/search" element={<Search />} />
               <Route path="/about" element={<About />} />
               <Route path="/contact" element={<Contact />} />
+              <Route path="/cart" element={<Cart />} />
+              <Route path="/auth" element={<Auth />} />
               <Route path="/admin" element={<AdminPanel />} />
               <Route path="/test-cart" element={<TestCart />} />
               <Route path="/dev-check" element={<DevCheck />} />

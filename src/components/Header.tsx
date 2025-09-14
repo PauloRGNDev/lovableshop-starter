@@ -47,25 +47,25 @@ export const Header: React.FC<HeaderProps> = ({
           {/* Navigation - Desktop */}
           <nav className="hidden md:flex items-center space-x-8">
             <a 
-              href="#home" 
+              href="/" 
               className="text-sm font-medium hover:text-luxury-gold transition-colors"
             >
               Início
             </a>
             <a 
-              href="#products" 
+              href="/products" 
               className="text-sm font-medium hover:text-luxury-gold transition-colors"
             >
               Catálogo
             </a>
             <a 
-              href="#about" 
+              href="/about" 
               className="text-sm font-medium hover:text-luxury-gold transition-colors"
             >
               Sobre
             </a>
             <a 
-              href="#contact" 
+              href="/contact" 
               className="text-sm font-medium hover:text-luxury-gold transition-colors"
             >
               Contato
@@ -94,7 +94,7 @@ export const Header: React.FC<HeaderProps> = ({
             <Button
               variant="ghost"
               size="sm"
-              onClick={onUserClick}
+              onClick={() => window.location.href = '/auth'}
             >
               <User className="h-4 w-4" />
             </Button>
@@ -102,7 +102,7 @@ export const Header: React.FC<HeaderProps> = ({
             <Button
               variant="ghost"
               size="sm"
-              onClick={onCartClick}
+              onClick={() => window.location.href = '/cart'}
               className="relative"
             >
               <ShoppingBag className="h-4 w-4" />
